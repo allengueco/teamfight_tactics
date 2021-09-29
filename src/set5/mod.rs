@@ -1,7 +1,8 @@
 use crate::tft::unit::{SynergyBreakpoint};
 
 #[derive(PartialEq, Debug)]
-enum Synergy {
+#[allow(dead_code)]
+pub enum Synergy {
     // Origins
     Sentinel,
     Revenant,
@@ -32,6 +33,7 @@ enum Synergy {
     Brawler,
     Assassin,
 }
+use Synergy::*;
 impl crate::tft::unit::Synergy for Synergy {
     fn interval(&self) -> SynergyBreakpoint {
         match self {
@@ -79,35 +81,17 @@ impl crate::tft::item::Item for Item {
     }
 }
 
-// macro_rules! set5_unit {
-//     ($name: ident: $cost: expr; $syn: expr) => {
-//         pub fn $name() -> crate::tft::unit::Unit::<> {
-//             const N: usize = $syn.len();
-//             crate::tft::unit::Unit::<Synergy, N> {
-//                 name: stringify!($name),
-//                 synergies: $syn,
-//                 cost: $cost
-//             }
-//         }
-//     };
-//     // ($name: ident: $cost:expr, [ $($syn:expr),+ ]) => {
-//     //     fn $name() -> Unit {
-//     //         let mut v = Vec::new();
-//     //         $(
-//     //             v.push(Box::new($syn));
-//     //         )*
-//     //         Unit {
-//     //             name: stringify!($name),
-//     //             synergies: v,
-//     //             cost: $cost
-//     //         }
-//     //     }
-//     // }
-// }
-// set5_unit! {
-//     garen: 5; [Synergy::Victorious, Synergy::Dawnbringer]
-// }
+pub fn garen() -> crate::tft::unit::Unit<Synergy, 2> {
+    let syns = [Dawnbringer, Knight];
+    crate::tft::unit::Unit { name: "Garen", synergies: syns, cost: 5 }
+}
+
+pub fn kayle() -> crate::tft::unit::Unit<Synergy, 2> {
+    let syns = [Legionnaire, Redeemed];
+    crate::tft::unit::Unit { name: "Kayle", synergies: syns, cost: 5 }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::*;
+    
 }

@@ -13,9 +13,7 @@ mod tft {
         }
         pub enum SynergyBreakpoint {
             Unique,
-            One { start: u8, n: u8 },
-            Two { start: u8, n: u8 },
-            Three { start: u8, n: u8 },
+            Steps(Vec<u8>)
         }
 
         impl From<&str> for SynergyBreakpoint {
@@ -24,17 +22,10 @@ mod tft {
                     .split('/')
                     .map(|s| s.parse().unwrap())
                     .collect::<Vec<u8>>();
-                let n = vec.len() as u8;
-                let start = vec[0];
 
-                match vec.as_slice() {
-                    [_] => SynergyBreakpoint::Unique,
-                    [s @ ..] => match s[1] - s[0] {
-                        1 => SynergyBreakpoint::One { start, n },
-                        2 => SynergyBreakpoint::Two { start, n },
-                        3 => SynergyBreakpoint::Three { start, n },
-                        x => panic!("invalid breakpoint interval: {}", x),
-                    },
+                match vec.len() {
+                    1 => SynergyBreakpoint::Unique,
+                    _ => SynergyBreakpoint::Steps(vec)
                 }
             }
         }
