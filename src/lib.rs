@@ -20,7 +20,7 @@ mod tft {
             fn from(str: &str) -> Self {
                 let vec = str
                     .split('/')
-                    .map(|s| s.parse().unwrap())
+                    .map(|s| s.parse().expect("Cannot parse breakpoint"))
                     .collect::<Vec<u8>>();
 
                 match vec.len() {
@@ -29,12 +29,15 @@ mod tft {
                 }
             }
         }
-        pub(crate) struct Cost(pub u8);
     }
     pub(crate) mod item {
         pub trait Item {
             fn name(&self) -> &str;
             fn description(&self) -> &str;
+        }
+
+        pub trait MakeItem<I: Item> {
+            fn make(item1: I, item2: I) -> I;
         }
     }
 
