@@ -1,3 +1,3 @@
-import * as wasm from "hello-wasm-pack";
+import * as tft from "lib-tft-set5-wasm";
 
-wasm.greet();
+const units = new tft.Units();
