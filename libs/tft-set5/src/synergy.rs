@@ -1,4 +1,4 @@
-use crate::tft::unit::{Synergy, SynergyBreakpoint};
+use lib_tft_core::{Synergy, SynergyBreakpoint};
 
 #[allow(dead_code)]
 #[derive(PartialEq, Debug)]

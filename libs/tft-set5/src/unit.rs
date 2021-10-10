@@ -1,5 +1,5 @@
-use crate::tft::unit::Unit;
-use crate::set5::synergy::*;
+use lib_tft_core::Unit;
+use crate::synergy::*;
 pub fn garen() -> Unit<SynergySet5, 2> {
     Unit { name: "Garen", synergies: [Dawnbringer, Knight], cost: 5 }
 }
