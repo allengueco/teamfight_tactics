@@ -1,7 +1,7 @@
 pub(crate) mod unit;
 pub(crate) mod item;
-pub(crate) mod synergy;
+pub(crate) mod r#trait;
 
 pub use unit::*;
 pub use item::*;
-pub use synergy::*;
+pub use r#trait::*;

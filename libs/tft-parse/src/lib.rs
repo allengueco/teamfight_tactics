@@ -3,6 +3,7 @@ use std::io::BufReader;
 use std::path::Path;
 
 use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
 
 // TODO: Add custom error codes with `thiserror` crate
 pub trait Creator<T> {
@@ -14,14 +15,34 @@ pub trait Creator<T> {
     }
 }
 
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum TraitStyle {
+    Bronze { min: u8, max: Option<u8> },
+    Gold { min: u8, max: Option<u8> },
+    Silver { min: u8, max: Option<u8> },
+    Chromatic { min: u8, max: Option<u8> },
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum TraitType {
+    Origin,
+    Class,
+}
+
+pub trait Unit { }
+pub trait Item { }
+pub trait Trait { }
+
 struct UnitCreator;
 impl<U> Creator<U> for UnitCreator {}
 
 struct ItemCreator;
 impl<I> Creator<I> for ItemCreator {}
 
-struct ChampionCreator;
-impl<C> Creator<C> for ChampionCreator {}
+struct TraitCreator;
+impl<C> Creator<C> for TraitCreator {}
 
 
 #[cfg(test)]
@@ -39,6 +60,14 @@ mod tests {
     struct TestItem {
         name: String,
         description: String,
+    }
+
+    #[derive(Deserialize, Debug, PartialEq)]
+    struct TestTrait {
+        key: String,
+        name: String,
+        description: String,
+
     }
 
     #[test]
@@ -86,5 +115,21 @@ mod tests {
         assert_eq!(TestItem { name: "B. F. Sword".to_owned(), description: "Gain Attack Damage."
             .to_owned() }, actual[0]);
         assert_eq!(expected, actual);
+    }
+
+    #[test]
+    pub fn parse_traits_json() {
+        let expected: Vec<TestTrait> = serde_json::from_str(r#"
+            [
+                {
+                    "name": "Champion1",
+                    "cost": 5,
+                },
+                {
+                    "name": "Champion2",
+                    "cost": 33
+                }
+            ]
+        "#).unwrap();
     }
 }
