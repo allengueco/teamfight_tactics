@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Set5Items {
+pub struct Set5Item {
     id: u8,
     name: String,
     description: String,

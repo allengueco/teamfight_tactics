@@ -6,12 +6,29 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 // TODO: Add custom error codes with `thiserror` crate
-pub trait Creator<T> {
-    fn create<P: AsRef<Path>>(path: P) -> serde_json::Result<T>
-    where T: DeserializeOwned {
+pub trait Creator {
+    type Type: DeserializeOwned;
+    fn create<P: AsRef<Path>>(path: P) -> serde_json::Result<Vec<Self::Type>> {
         let f = File::open(path).unwrap();
         let rdr = BufReader::new(f);
         serde_json::from_reader(rdr)
+    }
+}
+
+pub trait Set<U, I, T, X, Y, Z>
+where
+    X: Creator<Type = U>,
+    Y: Creator<Type = I>,
+    Z: Creator<Type = T>,
+{
+    fn units<P: AsRef<Path>>(path: P) -> Vec<U> {
+        X::create(path).unwrap()
+    }
+    fn items<P: AsRef<Path>>(path: P) -> Vec<I> {
+        Y::create(path).unwrap()
+    }
+    fn traits<P: AsRef<Path>>(path: P) -> Vec<T> {
+        Z::create(path).unwrap()
     }
 }
 
@@ -31,24 +48,29 @@ pub enum TraitType {
     Class,
 }
 
-pub trait Unit { }
-pub trait Item { }
-pub trait Trait { }
-
-struct UnitCreator;
-impl<U> Creator<U> for UnitCreator {}
-
-struct ItemCreator;
-impl<I> Creator<I> for ItemCreator {}
-
-struct TraitCreator;
-impl<C> Creator<C> for TraitCreator {}
-
-
 #[cfg(test)]
 mod tests {
-    use super::*;
     use serde::Deserialize;
+
+    use super::*;
+
+    struct UnitCreator;
+
+    impl Creator for UnitCreator {
+        type Type = TestUnit;
+    }
+
+    struct ItemCreator;
+
+    impl Creator for ItemCreator {
+        type Type = TestItem;
+    }
+
+    struct TraitCreator;
+
+    impl Creator for TraitCreator {
+        type Type = TestTrait;
+    }
 
     #[derive(Deserialize, Debug, PartialEq)]
     struct TestUnit {
@@ -67,12 +89,12 @@ mod tests {
         key: String,
         name: String,
         description: String,
-
     }
 
     #[test]
     pub fn parse_units_json() {
-        let expected: Vec<TestUnit> = serde_json::from_str(r#"
+        let expected: Vec<TestUnit> = serde_json::from_str(
+            r#"
             [
                 {
                     "name": "Allen",
@@ -83,19 +105,28 @@ mod tests {
                     "cost": 33
                 }
             ]
-        "#).unwrap();
+        "#,
+        )
+        .unwrap();
 
-        let actual: Vec<TestUnit> = UnitCreator::create(Path::new("src/resources/test_units.json"))
-            .unwrap();
+        let actual: Vec<TestUnit> =
+            UnitCreator::create(Path::new("src/resources/test_units.json")).unwrap();
 
         assert!(!actual.is_empty());
-        assert_eq!(TestUnit { name: "Allen".to_owned(), cost: 22 }, actual[0]);
+        assert_eq!(
+            TestUnit {
+                name: "Allen".to_owned(),
+                cost: 22
+            },
+            actual[0]
+        );
         assert_eq!(expected, actual);
     }
 
     #[test]
     pub fn parse_items_json() {
-        let expected: Vec<TestItem> = serde_json::from_str(r#"
+        let expected: Vec<TestItem> = serde_json::from_str(
+            r#"
             [
                 {
                     "name": "B. F. Sword",
@@ -106,20 +137,28 @@ mod tests {
                     "description": "Gain Attack Speed."
                 }
             ]
-        "#).unwrap();
+        "#,
+        )
+        .unwrap();
 
-        let actual: Vec<TestItem> = ItemCreator::create(Path::new("src/resources/test_items.json"))
-            .unwrap();
+        let actual: Vec<TestItem> =
+            ItemCreator::create(Path::new("src/resources/test_items.json")).unwrap();
 
         assert!(!actual.is_empty());
-        assert_eq!(TestItem { name: "B. F. Sword".to_owned(), description: "Gain Attack Damage."
-            .to_owned() }, actual[0]);
+        assert_eq!(
+            TestItem {
+                name: "B. F. Sword".to_owned(),
+                description: "Gain Attack Damage.".to_owned(),
+            },
+            actual[0]
+        );
         assert_eq!(expected, actual);
     }
 
     #[test]
     pub fn parse_traits_json() {
-        let expected: Vec<TestTrait> = serde_json::from_str(r#"
+        let expected: Vec<TestTrait> = serde_json::from_str(
+            r#"
             [
                 {
                     "name": "Champion1",
@@ -130,6 +169,8 @@ mod tests {
                     "cost": 33
                 }
             ]
-        "#).unwrap();
+        "#,
+        )
+        .unwrap();
     }
 }
