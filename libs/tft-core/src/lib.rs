@@ -1,11 +1,10 @@
-pub(crate) mod unit;
 pub(crate) mod item;
 pub(crate) mod synergy;
+pub(crate) mod unit;
 
-pub use unit::*;
 pub use item::*;
 pub use synergy::*;
-
+pub use unit::*;
 
 // macro_rules! synergy {
 //             (
@@ -34,7 +33,6 @@ pub use synergy::*;
 //     kayle => 5 legionnaire redeemed,
 //     miss_fortune => cannoneer forgotten,
 // }
-
 
 #[cfg(test)]
 mod tests {

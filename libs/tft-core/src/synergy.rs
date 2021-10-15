@@ -4,7 +4,7 @@ pub trait Synergy {
 
 pub enum SynergyBreakpoint {
     Unique,
-    Steps(Vec<u8>)
+    Steps(Vec<u8>),
 }
 
 impl From<&str> for SynergyBreakpoint {
@@ -16,7 +16,7 @@ impl From<&str> for SynergyBreakpoint {
 
         match vec.len() {
             1 => SynergyBreakpoint::Unique,
-            _ => SynergyBreakpoint::Steps(vec)
+            _ => SynergyBreakpoint::Steps(vec),
         }
     }
 }

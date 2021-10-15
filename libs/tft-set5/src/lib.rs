@@ -5,35 +5,20 @@ use lib_tft_parse::{Creator, Set};
 pub use r#trait::*;
 pub use unit::*;
 
-pub(crate) mod unit;
 pub(crate) mod item;
 pub(crate) mod r#trait;
-
-pub struct ChampionCreator;
-
-impl Creator for ChampionCreator {
-    type Type = Set5Unit;
-}
-
-pub struct ItemCreator;
-
-impl Creator for ItemCreator {
-    type Type = Set5Item;
-}
-
-pub struct TraitCreator;
-
-impl Creator for TraitCreator {
-    type Type = Set5Trait;
-}
+pub(crate) mod unit;
 
 pub struct Set5 {
     units: Vec<Set5Unit>,
     items: Vec<Set5Item>,
     traits: Vec<Set5Trait>,
 }
+impl Creator<Set5Unit> for Set5 {}
+impl Creator<Set5Item> for Set5 {}
+impl Creator<Set5Trait> for Set5 {}
 
-impl Set<Set5Unit, Set5Item, Set5Trait, ChampionCreator, ItemCreator, TraitCreator> for Set5 {}
+impl Set<Set5Unit, Set5Item, Set5Trait> for Set5 {}
 
 impl Set5 {
     pub fn new<P: AsRef<Path>>(
@@ -42,9 +27,9 @@ impl Set5 {
         traits_file_path: P,
     ) -> Self {
         Self {
-            units: Set5::units(champions_file_path),
-            items: Set5::items(items_file_path),
-            traits: Set5::traits(traits_file_path),
+            units: Self::units(champions_file_path),
+            items: Self::items(items_file_path),
+            traits: Self::traits(traits_file_path),
         }
     }
 }
@@ -53,15 +38,15 @@ impl Set5 {
 mod tests {
     use super::*;
 
-    mod unit {
-        use super::*;
-    }
-
-    mod item {
-        use super::*;
-    }
-
-    mod r#trait {
-        use super::*;
+    #[test]
+    pub fn test_set5() {
+        let s5: Set5 = Set5::new(
+            Path::new("src/resources/champions.json"),
+            Path::new("src/resources/items.json"),
+            Path::new("src/resources/traits.json"),
+        );
+        assert!(!s5.units.is_empty());
+        assert!(!s5.items.is_empty());
+        assert!(!s5.traits.is_empty());
     }
 }

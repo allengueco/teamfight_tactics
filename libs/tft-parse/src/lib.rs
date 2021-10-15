@@ -6,34 +6,34 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 // TODO: Add custom error codes with `thiserror` crate
-pub trait Creator {
-    type Type: DeserializeOwned;
-    fn create<P: AsRef<Path>>(path: P) -> serde_json::Result<Vec<Self::Type>> {
+pub trait Creator<T: DeserializeOwned> {
+    fn create<P: AsRef<Path>>(path: P) -> serde_json::Result<Vec<T>> {
         let f = File::open(path).unwrap();
         let rdr = BufReader::new(f);
         serde_json::from_reader(rdr)
     }
 }
 
-pub trait Set<U, I, T, X, Y, Z>
+pub trait Set<U, I, T>: Creator<U> + Creator<I> + Creator<T>
 where
-    X: Creator<Type = U>,
-    Y: Creator<Type = I>,
-    Z: Creator<Type = T>,
+    U: DeserializeOwned,
+    I: DeserializeOwned,
+    T: DeserializeOwned,
 {
     fn units<P: AsRef<Path>>(path: P) -> Vec<U> {
-        X::create(path).unwrap()
+        Self::create(path).unwrap()
     }
     fn items<P: AsRef<Path>>(path: P) -> Vec<I> {
-        Y::create(path).unwrap()
+        Self::create(path).unwrap()
     }
     fn traits<P: AsRef<Path>>(path: P) -> Vec<T> {
-        Z::create(path).unwrap()
+        Self::create(path).unwrap()
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
+#[serde(tag = "style")]
 pub enum TraitStyle {
     Bronze { min: u8, max: Option<u8> },
     Gold { min: u8, max: Option<u8> },
@@ -41,7 +41,7 @@ pub enum TraitStyle {
     Chromatic { min: u8, max: Option<u8> },
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub enum TraitType {
     Origin,
@@ -56,21 +56,15 @@ mod tests {
 
     struct UnitCreator;
 
-    impl Creator for UnitCreator {
-        type Type = TestUnit;
-    }
+    impl Creator<TestUnit> for UnitCreator {}
 
     struct ItemCreator;
 
-    impl Creator for ItemCreator {
-        type Type = TestItem;
-    }
+    impl Creator<TestItem> for ItemCreator {}
 
     struct TraitCreator;
 
-    impl Creator for TraitCreator {
-        type Type = TestTrait;
-    }
+    impl Creator<TestTrait> for TraitCreator {}
 
     #[derive(Deserialize, Debug, PartialEq)]
     struct TestUnit {
@@ -161,16 +155,24 @@ mod tests {
             r#"
             [
                 {
-                    "name": "Champion1",
-                    "cost": 5,
+                    "key": "Set5_Abomination",
+                    "name": "Abomination",
+                    "description": "Abom desc."
                 },
                 {
-                    "name": "Champion2",
-                    "cost": 33
+                    "key": "Set5_Assassin",
+                    "name": "Assassin",
+                    "description": "Sins desc."
                 }
             ]
         "#,
         )
         .unwrap();
+
+        let actual: Vec<TestTrait> =
+            TraitCreator::create(Path::new("src/resources/test_items.json")).unwrap();
+
+        assert!(!actual.is_empty());
+        assert_eq!(expected, actual);
     }
 }

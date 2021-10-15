@@ -1,13 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Set5Item {
-    id: u8,
+    id: usize,
     name: String,
     description: String,
     is_unique: bool,
     is_elusive: bool,
     is_radiant: bool,
 }
-
