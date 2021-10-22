@@ -1,7 +1,7 @@
 use lib_tft_parse::{TraitStyle, TraitType};
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Set5Trait {
     key: String,
     name: String,

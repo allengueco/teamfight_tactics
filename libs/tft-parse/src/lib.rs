@@ -31,7 +31,7 @@ where
     }
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "style")]
 pub enum TraitStyle {
@@ -41,7 +41,7 @@ pub enum TraitStyle {
     Chromatic { min: u8, max: Option<u8> },
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub enum TraitType {
     Origin,
